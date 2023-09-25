@@ -1,4 +1,6 @@
-project('kiosk-shell-dpms', 'cpp', 'c', version: '0.1')
+project('kiosk-shell-dpms', 'c', version: '0.1', default_options: [
+  'c_std=C17'
+])
 
 libweston_version = 10
 dir_prefix = get_option('prefix')

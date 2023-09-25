@@ -1,5 +1,6 @@
 #include <libweston/libweston.h>
 #include <libweston/zalloc.h>
+#include <stdint.h>
 
 // Taken from https://gitlab.freedesktop.org/wayland/weston/-/blob/main/shared/helpers.h?ref_type=heads#L139
 #ifndef container_of
@@ -21,7 +22,7 @@ WL_EXPORT int wet_module_init(struct weston_compositor *, int *, char **);
 static void weston_compositor_destroy_listener(struct wl_listener *, void *);
 static void weston_compositor_idle_listener(struct wl_listener *, void *);
 static void weston_compositor_wake_listener(struct wl_listener *, void *);
-void set_power_state(struct dpms *, uint mode);
+void set_power_state(struct dpms *, uint32_t mode);
 
 
 WL_EXPORT int
@@ -75,7 +76,7 @@ static void weston_compositor_wake_listener(struct wl_listener *listener, void *
 }
 
 
-void set_power_state(struct dpms *display, uint mode) {
+void set_power_state(struct dpms *display, uint32_t mode) {
     if(mode) {
         weston_compositor_wake(display->compositor);
         display->state = 1;

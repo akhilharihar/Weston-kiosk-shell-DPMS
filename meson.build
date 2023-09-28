@@ -1,5 +1,5 @@
 project('kiosk-shell-dpms', 'c', version: '0.1', default_options: [
-  'c_std=C17'
+  'c_std=c17'
 ])
 
 libweston_version = 10

@@ -12,6 +12,10 @@ weston = dependency('libweston-@0@'.format(libweston_version), method: 'pkg-conf
 wayland = dependency('wayland-server', method: 'pkg-config')
 pix = dependency('pixman-1', method : 'pkg-config')
 
+if get_option('buildtype') == 'debug'
+  add_project_arguments('-DDEBUG', language: ['c', 'cpp'])
+endif
+
 shared_library(
   'kiosk-dpms',
   'src/kiosk-dpms.c',

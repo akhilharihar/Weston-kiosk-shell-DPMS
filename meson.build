@@ -10,6 +10,7 @@ dir_system_include = '/usr/include'
 
 weston = dependency('libweston-@0@'.format(libweston_version), method: 'pkg-config')
 wayland = dependency('wayland-server', method: 'pkg-config')
+wayland_client = dependency('wayland-client', method: 'pkg-config')
 pix = dependency('pixman-1', method : 'pkg-config')
 
 if get_option('buildtype') == 'debug'
@@ -18,10 +19,18 @@ endif
 
 shared_library(
   'kiosk-dpms',
-  'src/kiosk-dpms.c',
+  'src/kiosk-dpms.c', 'src/kiosk-shell-dpms-interface.c',
   dependencies: [weston, wayland, pix],
   name_prefix: '',
   install: true,
   install_dir: dir_module_weston,
   include_directories: ['@0@/libweston-10'.format(dir_system_include), '@0@/pixman-1'.format(dir_system_include)]
+)
+
+executable(
+  'testing',
+  'src/test.c', 'src/kiosk-shell-dpms-interface.c',
+  dependencies: [wayland_client],
+  name_prefix: '',
+  install: false
 )

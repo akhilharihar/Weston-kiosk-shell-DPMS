@@ -2,6 +2,10 @@ project('kiosk-shell-dpms', 'c', version: '0.1', default_options: [
   'c_std=c17'
 ])
 
+if get_option('buildtype') == 'debug'
+  add_project_arguments('-DDEBUG', language: ['c', 'cpp'])
+endif
+
 libweston_version = 10
 dir_prefix = get_option('prefix')
 dir_lib = dir_prefix / get_option('libdir')
@@ -17,42 +21,38 @@ wayland_scanner_prog = find_program(wayland_scanner.get_variable('wayland_scanne
 
 protocol_server_header = custom_target(
   'protocol_server_header',
-  input: 'protocol/dpms.xml',
-  output: 'kiosk-shell-dpms-interface.h',
+  input: 'protocol/kiosk-dpms.xml',
+  output: 'kiosk-shell-dpms-server-protocol.h',
   command: [wayland_scanner_prog, 'server-header', '@INPUT@', '@OUTPUT@']
 )
 
-protocol_code = custom_target(
-  'protocol_code',
-  input: 'protocol/dpms.xml',
-  output: 'kiosk-shell-dpms-interface.c',
+protocol_glue_code = custom_target(
+  'protocol_glue_code',
+  input: 'protocol/kiosk-dpms.xml',
+  output: 'kiosk-shell-dpms-protocol.c',
   command: [wayland_scanner_prog, 'private-code', '@INPUT@', '@OUTPUT@']
 )
 
 protocol_client_header = custom_target(
   'protocol_client_header',
-  input: 'protocol/dpms.xml',
-  output: 'kiosk-shell-dpms-client.h',
+  input: 'protocol/kiosk-dpms.xml',
+  output: 'kiosk-shell-dpms-client-protocol.h',
   command: [wayland_scanner_prog, 'client-header', '@INPUT@', '@OUTPUT@']
 )
 
-if get_option('buildtype') == 'debug'
-  add_project_arguments('-DDEBUG', language: ['c', 'cpp'])
-endif
-
 shared_library(
-  'kiosk-dpms',
-  'src/kiosk-dpms.c', protocol_code, protocol_server_header,
+  'kiosk-shell-dpms',
+  'src/kiosk-shell-dpms.c', protocol_glue_code, protocol_server_header,
   dependencies: [weston, wayland_server, pix],
   name_prefix: '',
   install: true,
   install_dir: dir_module_weston,
-  include_directories: ['@0@/libweston-10'.format(dir_system_include), '@0@/pixman-1'.format(dir_system_include)]
+  include_directories: ['@0@/libweston-@1@'.format(dir_system_include, libweston_version), '@0@/pixman-1'.format(dir_system_include)]
 )
 
 executable(
-  'testing',
-  'src/test.c', protocol_code, protocol_client_header,
+  'dpms-client',
+  'src/dpms-client.c', protocol_glue_code, protocol_client_header,
   dependencies: [wayland_client],
   name_prefix: '',
   install: false

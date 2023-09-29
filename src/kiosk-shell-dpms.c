@@ -1,7 +1,7 @@
 #include <libweston/libweston.h>
 #include <libweston/zalloc.h>
 #include <stdint.h>
-#include "kiosk-shell-dpms-interface.h"
+#include "kiosk-shell-dpms-server-protocol.h"
 
 struct dpms {
     int state;
@@ -24,6 +24,7 @@ static void bind_dpms(struct wl_client *client, void *data, uint32_t version, ui
 static void unbind_dpms(struct wl_resource *resource) {
 
 }
+
 static void set_dpms_mode(struct wl_client *client, struct wl_resource *resource, uint32_t mode) {
     set_power_state(display, mode);
 }

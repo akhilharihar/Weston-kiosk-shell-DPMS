@@ -1,0 +1,8 @@
+<protocol name="kiosk_shell_dpms_management">
+    <interface name="kiosk_shell_dpms_manager" version="1">
+        <description summary="turn display on and off"></description>
+        <request name="set_mode">
+            <arg name="mode" type="uint"/>
+        </request>
+    </interface>
+</protocol>

@@ -23,6 +23,7 @@ void set_power_state(struct dpms *, uint32_t);
 static void bind_dpms(struct wl_client *, void *, uint32_t, uint32_t);
 static void unbind_dpms(struct wl_resource *);
 static void set_dpms_mode(struct wl_client *, struct wl_resource *, uint32_t);
+void update_display_state();
 
 static const struct kiosk_shell_dpms_manager_interface dpms_implementation = {
     .set_mode = set_dpms_mode
@@ -39,6 +40,8 @@ wet_module_init(struct weston_compositor *compositor, int *argc, char **argv) {
     }
 
     display->compositor = compositor;
+
+    update_display_state();
 
     if(!weston_compositor_add_destroy_listener_once(compositor, &display->destroy_listner, weston_compositor_destroy_listener)){
         free(display);
@@ -81,6 +84,11 @@ static void weston_compositor_wake_listener(struct wl_listener *listener, void *
 }
 
 void set_power_state(struct dpms *display, uint32_t mode) {
+
+    if(display->state == mode) {
+        return;
+    }
+
     if(mode) {
         weston_compositor_wake(display->compositor);
         weston_log("Compositor set to active\n");
@@ -89,11 +97,7 @@ void set_power_state(struct dpms *display, uint32_t mode) {
         weston_log("Compositor set to sleep\n");
     }
 
-    if(display->compositor->state == 2 || display->compositor->state == 3) {
-        display->state = 0;
-    } else {
-        display->state = 1;
-    }
+    update_display_state();
 
 }
 
@@ -112,4 +116,12 @@ static void unbind_dpms(struct wl_resource *resource) {
 static void set_dpms_mode(struct wl_client *client, struct wl_resource *resource, uint32_t mode) {
     set_power_state(display, mode);
     kiosk_shell_dpms_manager_send_mode(resource, display->state);
+}
+
+void update_display_state() {
+    if(display->compositor->state == 2 || display->compositor->state == 3) {
+        display->state = 0;
+    } else {
+        display->state = 1;
+    }
 }

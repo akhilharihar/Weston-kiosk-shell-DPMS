@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <wayland-client.h>
-#include "kiosk-shell-client.h"
+#include "kiosk-shell-dpms-client.h"
 #include <string.h>
 
 struct kiosk_shell_dpms_manager *dpms_manager = NULL;

@@ -9,9 +9,32 @@ dir_module_weston = dir_lib / 'weston'
 dir_system_include = '/usr/include'
 
 weston = dependency('libweston-@0@'.format(libweston_version), method: 'pkg-config')
-wayland = dependency('wayland-server', method: 'pkg-config')
+wayland_server = dependency('wayland-server', method: 'pkg-config')
 wayland_client = dependency('wayland-client', method: 'pkg-config')
 pix = dependency('pixman-1', method : 'pkg-config')
+wayland_scanner = dependency('wayland-scanner', native: true)
+wayland_scanner_prog = find_program(wayland_scanner.get_variable('wayland_scanner'))
+
+protocol_server_header = custom_target(
+  'protocol_server_header',
+  input: 'protocol/dpms.xml',
+  output: 'kiosk-shell-dpms-interface.h',
+  command: [wayland_scanner_prog, 'server-header', '@INPUT@', '@OUTPUT@']
+)
+
+protocol_code = custom_target(
+  'protocol_code',
+  input: 'protocol/dpms.xml',
+  output: 'kiosk-shell-dpms-interface.c',
+  command: [wayland_scanner_prog, 'private-code', '@INPUT@', '@OUTPUT@']
+)
+
+protocol_client_header = custom_target(
+  'protocol_client_header',
+  input: 'protocol/dpms.xml',
+  output: 'kiosk-shell-dpms-client.h',
+  command: [wayland_scanner_prog, 'client-header', '@INPUT@', '@OUTPUT@']
+)
 
 if get_option('buildtype') == 'debug'
   add_project_arguments('-DDEBUG', language: ['c', 'cpp'])
@@ -19,8 +42,8 @@ endif
 
 shared_library(
   'kiosk-dpms',
-  'src/kiosk-dpms.c', 'src/kiosk-shell-dpms-interface.c',
-  dependencies: [weston, wayland, pix],
+  'src/kiosk-dpms.c', protocol_code, protocol_server_header,
+  dependencies: [weston, wayland_server, pix],
   name_prefix: '',
   install: true,
   install_dir: dir_module_weston,
@@ -29,7 +52,7 @@ shared_library(
 
 executable(
   'testing',
-  'src/test.c', 'src/kiosk-shell-dpms-interface.c',
+  'src/test.c', protocol_code, protocol_client_header,
   dependencies: [wayland_client],
   name_prefix: '',
   install: false

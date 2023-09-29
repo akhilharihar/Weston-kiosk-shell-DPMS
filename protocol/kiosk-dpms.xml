@@ -1,8 +1,36 @@
 <protocol name="kiosk_shell_dpms_management">
+
+    <description summary="Control power management modes of outputs">
+        This protocol allows clients to control power management modes of outputs that are currently part of the
+        compositor space.
+    </description>
+
     <interface name="kiosk_shell_dpms_manager" version="1">
-        <description summary="turn display on and off"></description>
+
+        <description summary="manager to adjust power management mode">
+            This interface offers requests to set the power management mode.
+        </description>
+
+        <enum name="mode">
+            <entry name="off" value="0" summary="Output is turned off." />
+            <entry name="on" value="1" summary="Output is turned on, no power saving" />
+        </enum>
+
         <request name="set_mode">
-            <arg name="mode" type="uint"/>
+            <description summary="Set an outputs power save mode">Set power save mode to the given mode. The
+                mode change is effective immediately.
+            </description>
+            <arg name="mode" type="uint" enum="mode" summary="the power save mode to set" />
         </request>
+
+        <event name="mode">
+            <description summary="Report a power management mode change">
+                The mode event is sent after an output changes its power management mode. The reason can be a client
+                using set_mode or the compositor deciding to change the mode.
+            </description>
+            <arg name="mode" type="uint" enum="mode" summary="Output new power management mode" />
+        </event>
+
     </interface>
+
 </protocol>

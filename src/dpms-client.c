@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     wl_display_roundtrip(display);
 
     if (!dpms_manager) {
-        printf("Could not initialize DPMS\n");
+        printf("Compositor does not support DPMS interface.\n");
         return -1;
     }
 

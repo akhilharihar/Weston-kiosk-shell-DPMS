@@ -1,4 +1,4 @@
-project('kiosk-shell-dpms', 'c', version: '0.1', default_options: [
+project('kiosk-shell-dpms', 'c', version: '0.2', default_options: [
   'c_std=c17'
 ])
 

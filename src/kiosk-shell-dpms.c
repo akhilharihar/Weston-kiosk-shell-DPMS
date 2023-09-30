@@ -1,7 +1,9 @@
 #include <libweston/libweston.h>
 #include <libweston/zalloc.h>
+#include <libweston/config-parser.h>
 #include <stdint.h>
 #include "kiosk-shell-dpms-server-protocol.h"
+#include <string.h>
 
 struct dpms {
     uint32_t state;
@@ -32,6 +34,24 @@ static const struct kiosk_shell_dpms_manager_interface dpms_implementation = {
 
 WL_EXPORT int
 wet_module_init(struct weston_compositor *compositor, int *argc, char **argv) {
+    const char *config_file;
+    char *current_shell = NULL;
+    struct weston_config *config;
+    struct weston_config_section *core_config_section;
+    config_file = weston_config_get_name_from_env();
+    config = weston_config_parse(config_file);
+    core_config_section = weston_config_get_section(config, "core", NULL, NULL);
+
+    weston_config_section_get_string(core_config_section, "shell", &current_shell, "not set");
+
+    if(strcmp(current_shell, "kiosk-shell.so")) {
+        weston_log("kiosk-shell-dpms.so module only supported on kiosk shell\n");
+        free(current_shell);
+        weston_config_destroy(config);
+        return 0;
+    }
+
+    free(current_shell);
 
     display = zalloc(sizeof *display);
 
@@ -59,6 +79,8 @@ wet_module_init(struct weston_compositor *compositor, int *argc, char **argv) {
         free(display);
         return -1;
     }
+
+    weston_config_destroy(config);
 
     weston_log("Kiosk DPMS initiated\n");
 

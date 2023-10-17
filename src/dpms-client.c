@@ -54,6 +54,7 @@ int main(int argc, char *argv[]) {
 
     if (!mode_option) {
         printf("-m option not specified.\n");
+        exit(1);
     }
 
     if (strcmp(mode_option, "off") == 0) {

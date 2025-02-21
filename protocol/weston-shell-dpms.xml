@@ -1,11 +1,11 @@
-<protocol name="kiosk_shell_dpms_management">
+<protocol name="weston_shell_dpms_management">
 
     <description summary="Control power management modes of outputs">
         This protocol allows clients to control power management modes of outputs that are currently part of the
         compositor space.
     </description>
 
-    <interface name="kiosk_shell_dpms_manager" version="1">
+    <interface name="weston_shell_dpms_manager" version="1">
 
         <description summary="manager to adjust power management mode">
             This interface offers requests to set the power management mode.

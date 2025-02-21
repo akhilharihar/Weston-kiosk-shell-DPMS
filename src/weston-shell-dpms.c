@@ -2,7 +2,7 @@
 #include <libweston/zalloc.h>
 #include <libweston/config-parser.h>
 #include <stdint.h>
-#include "kiosk-shell-dpms-server-protocol.h"
+#include "weston-shell-dpms-server-protocol.h"
 #include <string.h>
 
 struct dpms {
@@ -27,7 +27,7 @@ static void unbind_dpms(struct wl_resource *);
 static void set_dpms_mode(struct wl_client *, struct wl_resource *, uint32_t);
 void update_display_state();
 
-static const struct kiosk_shell_dpms_manager_interface dpms_implementation = {
+static const struct weston_shell_dpms_manager_interface dpms_implementation = {
     .set_mode = set_dpms_mode
 };
 
@@ -44,12 +44,12 @@ wet_module_init(struct weston_compositor *compositor, int *argc, char **argv) {
 
     weston_config_section_get_string(core_config_section, "shell", &current_shell, "not set");
 
-    if(strcmp(current_shell, "kiosk-shell.so")) {
-        weston_log("kiosk-shell-dpms.so module only supported on kiosk shell\n");
-        free(current_shell);
-        weston_config_destroy(config);
-        return 0;
-    }
+    #if(strcmp(current_shell, "desktop-shell.so")) {
+    #    weston_log("shell-dpms.so module only supported on desktop shell\n");
+    #    free(current_shell);
+    #    weston_config_destroy(config);
+    #    return 0;
+    #}
 
     free(current_shell);
 
@@ -74,7 +74,7 @@ wet_module_init(struct weston_compositor *compositor, int *argc, char **argv) {
     display->idle_listner.notify = weston_compositor_idle_listener;
     wl_signal_add(&compositor->idle_signal, &display->idle_listner);
 
-    if(!wl_global_create(compositor->wl_display, &kiosk_shell_dpms_manager_interface, 1, NULL, bind_dpms)) {
+    if(!wl_global_create(compositor->wl_display, &weston_shell_dpms_manager_interface, 1, NULL, bind_dpms)) {
         wl_list_remove(&display->destroy_listner.link);
         free(display);
         return -1;
@@ -82,7 +82,7 @@ wet_module_init(struct weston_compositor *compositor, int *argc, char **argv) {
 
     weston_config_destroy(config);
 
-    weston_log("Kiosk DPMS initiated\n");
+    weston_log("DPMS initiated\n");
 
     return 0;
 }
@@ -93,16 +93,16 @@ static void weston_compositor_destroy_listener(struct wl_listener *listener, voi
     wl_list_remove(&display->wake_listner.link);
     free(display);
     #ifdef DEBUG
-    weston_log("Kiosk DPMS destroyed\n");
+    weston_log("DPMS destroyed\n");
     #endif
 }
 
 static void weston_compositor_idle_listener(struct wl_listener *listener, void *data) {
-    set_power_state(display, KIOSK_SHELL_DPMS_MANAGER_MODE_OFF);
+    set_power_state(display, WESTON_SHELL_DPMS_MANAGER_MODE_OFF);
 }
 
 static void weston_compositor_wake_listener(struct wl_listener *listener, void *data) {
-    set_power_state(display, KIOSK_SHELL_DPMS_MANAGER_MODE_ON);
+    set_power_state(display, WESTON_SHELL_DPMS_MANAGER_MODE_ON);
 }
 
 void set_power_state(struct dpms *display, uint32_t mode) {
@@ -125,10 +125,10 @@ void set_power_state(struct dpms *display, uint32_t mode) {
 
 static void bind_dpms(struct wl_client *client, void *data, uint32_t version, uint32_t id) {
     struct wl_resource *resource;
-    resource = wl_resource_create(client, &kiosk_shell_dpms_manager_interface, 1, id);
+    resource = wl_resource_create(client, &weston_shell_dpms_manager_interface, 1, id);
     wl_resource_set_implementation(resource, &dpms_implementation, NULL, unbind_dpms);
-    kiosk_shell_dpms_manager_send_mode(resource, display->state);
-    weston_log("Kiosk DPMS bound\n");
+    weston_shell_dpms_manager_send_mode(resource, display->state);
+    weston_log("DPMS bound\n");
 }
 
 static void unbind_dpms(struct wl_resource *resource) {
@@ -137,7 +137,7 @@ static void unbind_dpms(struct wl_resource *resource) {
 
 static void set_dpms_mode(struct wl_client *client, struct wl_resource *resource, uint32_t mode) {
     set_power_state(display, mode);
-    kiosk_shell_dpms_manager_send_mode(resource, display->state);
+    weston_shell_dpms_manager_send_mode(resource, display->state);
 }
 
 void update_display_state() {

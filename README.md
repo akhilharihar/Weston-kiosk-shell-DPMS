@@ -1,6 +1,6 @@
-# Weston kiosk-shell DPMS Extension
+# Weston DPMS Extension
 
-Module for Weston compositor kiosk shell providing DPMS functionality.
+Module for Weston shell providing DPMS functionality.
 
 ## Setup
 
@@ -15,29 +15,29 @@ meson .. --prefix=/usr
 ninja && sudo ninja install
 ```
 
-3. Add `kiosk-shell-dpms.so` to modules key in weston config. Eg:
+3. Add `weston-shell-dpms.so` to modules key in weston config. Eg:
 ```
 [core]
 shell=kiosk-shell.so
-modules=systemd-notify.so,kiosk-shell-dpms.so
+modules=systemd-notify.so,weston-shell-dpms.so
 ```
 
 ## Controlling DPMS state.
 
-This repo also generates a [client](src/dpms-client.c) program that you can use to control the DPMS state.
+This repo also generates a [client](src/weston-dpms.c) program that you can use to control the DPMS state.
 
-DPMS state can be contorlled by passing -m option with on, off as value.
+DPMS state can be controlled by passing -m option with on, off as value.
 
 To Turn on the monitor:
 
 ```shell
-./build/dpms-client -m on
+./build/weston-dpms -m on
 ```
 
 To Turn off the monitor:
 
 ```shell
-./build/dpms-client -m off
+./build/weston-dpms -m off
 ```
 
 Ensure that `WAYLAND_DISPLAY` env variable is set.

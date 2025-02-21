@@ -1,4 +1,4 @@
-project('kiosk-shell-dpms', 'c', version: '0.2', default_options: [
+project('weston-dpms', 'c', version: '0.3', default_options: [
   'c_std=c17'
 ])
 
@@ -21,28 +21,28 @@ wayland_scanner_prog = find_program(wayland_scanner.get_variable('wayland_scanne
 
 protocol_server_header = custom_target(
   'protocol_server_header',
-  input: 'protocol/kiosk-dpms.xml',
-  output: 'kiosk-shell-dpms-server-protocol.h',
+  input: 'protocol/weston-shell-dpms.xml',
+  output: 'weston-shell-dpms-server-protocol.h',
   command: [wayland_scanner_prog, 'server-header', '@INPUT@', '@OUTPUT@']
 )
 
 protocol_glue_code = custom_target(
   'protocol_glue_code',
-  input: 'protocol/kiosk-dpms.xml',
-  output: 'kiosk-shell-dpms-protocol.c',
+  input: 'protocol/weston-shell-dpms.xml',
+  output: 'weston-shell-dpms-protocol.c',
   command: [wayland_scanner_prog, 'private-code', '@INPUT@', '@OUTPUT@']
 )
 
 protocol_client_header = custom_target(
   'protocol_client_header',
-  input: 'protocol/kiosk-dpms.xml',
-  output: 'kiosk-shell-dpms-client-protocol.h',
+  input: 'protocol/weston-shell-dpms.xml',
+  output: 'weston-shell-dpms-client-protocol.h',
   command: [wayland_scanner_prog, 'client-header', '@INPUT@', '@OUTPUT@']
 )
 
 shared_library(
-  'kiosk-shell-dpms',
-  'src/kiosk-shell-dpms.c', protocol_glue_code, protocol_server_header,
+  'weston-shell-dpms',
+  'src/weston-shell-dpms.c', protocol_glue_code, protocol_server_header,
   dependencies: [weston, wayland_server, pix],
   name_prefix: '',
   install: true,
@@ -51,8 +51,8 @@ shared_library(
 )
 
 executable(
-  'dpms-client',
-  'src/dpms-client.c', protocol_glue_code, protocol_client_header,
+  'weston-dpms',
+  'src/weston-dpms.c', protocol_glue_code, protocol_client_header,
   dependencies: [wayland_client],
   name_prefix: '',
   install: false

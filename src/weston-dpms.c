@@ -1,27 +1,27 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <wayland-client.h>
-#include "kiosk-shell-dpms-client-protocol.h"
+#include "weston-shell-dpms-client-protocol.h"
 #include <string.h>
 #include <unistd.h>
 #include <getopt.h>
 #include <stdlib.h>
 
-struct kiosk_shell_dpms_manager *dpms_manager = NULL;
+struct weston_shell_dpms_manager *dpms_manager = NULL;
 
 uint32_t current_mode;
 
-static void handle_change(void *data, struct kiosk_shell_dpms_manager *kiosk_shell_dpms_manager, uint32_t mode) {
+static void handle_change(void *data, struct weston_dpms_manager *weston_dpms_manager, uint32_t mode) {
     current_mode = mode;
 }
 
-static const struct kiosk_shell_dpms_manager_listener event_listener = {
+static const struct weston_dpms_manager_listener event_listener = {
     handle_change};
 
 static void registry_handle_global(void *data, struct wl_registry *registry, uint32_t name, const char *interface, uint32_t version) {
-    if (strcmp(interface, kiosk_shell_dpms_manager_interface.name) == 0) {
-        dpms_manager = wl_registry_bind(registry, name, &kiosk_shell_dpms_manager_interface, 1);
-        kiosk_shell_dpms_manager_add_listener(dpms_manager, &event_listener, NULL);
+    if (strcmp(interface, weston_dpms_manager_interface.name) == 0) {
+        dpms_manager = wl_registry_bind(registry, name, &weston_dpms_manager_interface, 1);
+        weston_dpms_manager_add_listener(dpms_manager, &event_listener, NULL);
     }
 }
 
@@ -85,10 +85,10 @@ int main(int argc, char *argv[]) {
     }
 
     printf("Current mode: %d\n", current_mode);
-    kiosk_shell_dpms_manager_set_mode(dpms_manager, mode);
+    weston_dpms_manager_set_mode(dpms_manager, mode);
     wl_display_roundtrip(display);
     printf("New mode: %d\n", current_mode);
-    kiosk_shell_dpms_manager_destroy(dpms_manager);
+    weston_dpms_manager_destroy(dpms_manager);
 
     wl_display_disconnect(display);
     return 0;

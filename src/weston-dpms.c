@@ -7,7 +7,7 @@
 #include <getopt.h>
 #include <stdlib.h>
 
-struct weston_shell_dpms_manager *dpms_manager = NULL;
+struct weston_dpms_manager *dpms_manager = NULL;
 
 uint32_t current_mode;
 

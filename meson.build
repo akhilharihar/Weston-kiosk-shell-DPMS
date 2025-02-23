@@ -7,9 +7,15 @@ if get_option('buildtype') == 'debug'
 endif
 
 libweston_version = 10
+
 dir_prefix = get_option('prefix')
+
+dir_bin = dir_prefix / get_option('bindir')
 dir_lib = dir_prefix / get_option('libdir')
+
+dir_executable_weston = dir_bin
 dir_module_weston = dir_lib / 'weston'
+
 dir_system_include = '/usr/include'
 
 weston = dependency('libweston-@0@'.format(libweston_version), method: 'pkg-config')
@@ -55,5 +61,6 @@ executable(
   'src/weston-dpms.c', protocol_glue_code, protocol_client_header,
   dependencies: [wayland_client],
   name_prefix: '',
-  install: false
+  install: true,
+  install_dir: dir_executable_weston
 )

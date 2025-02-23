@@ -20,7 +20,7 @@ static const struct weston_shell_dpms_manager_listener event_listener = {
 
 static void registry_handle_global(void *data, struct wl_registry *registry, uint32_t name, const char *interface, uint32_t version) {
     if (strcmp(interface, weston_shell_dpms_manager_interface.name) == 0) {
-        dpms_manager = wl_registry_bind(registry, name, &weston_dpms_manager_interface, 1);
+        dpms_manager = wl_registry_bind(registry, name, &weston_shell_dpms_manager_interface, 1);
         weston_shell_dpms_manager_add_listener(dpms_manager, &event_listener, NULL);
     }
 }

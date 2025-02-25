@@ -44,13 +44,6 @@ wet_module_init(struct weston_compositor *compositor, int *argc, char **argv) {
 
     weston_config_section_get_string(core_config_section, "shell", &current_shell, "not set");
 
-    //if(strcmp(current_shell, "desktop-shell.so")) {
-    //    weston_log("shell-dpms.so module only supported on desktop shell\n");
-    //    free(current_shell);
-    //    weston_config_destroy(config);
-    //    return 0;
-    //}
-
     free(current_shell);
 
     display = zalloc(sizeof *display);
